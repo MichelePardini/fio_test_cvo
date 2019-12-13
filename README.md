@@ -14,4 +14,13 @@ This are the pre-req when configuring the testbed.
       
 2) Use FIO v3.16 min.
 
-When running the test you can also capture a perfstat, setting -t 2 -i 8,0. FIO has to be launched once perfstat reaches the 'sleeping' status in Iteration 1.
+How to use it
+
+a) Decide the size of the WSS based on the instance type
+b) edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS. Never change 'numjobs'.
+c) run 'fio create_dataset.fio' from 4 clients to create the dataset on the 4 volumes
+d) once the dataset has been created, decide which workload to run. For seq rx you can run 'fio 64k_seq_wr.fio' from all 8 Linux at the same time
+
+When running the test you can also capture a perfstat, setting -t 2 -i 8,0. FIO has to be launched once perfstat reaches the 'sleeping' status in Iteration 1. Meaning sync step d) with perfstat. 
+
+
