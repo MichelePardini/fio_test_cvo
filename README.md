@@ -23,4 +23,9 @@ d) once the dataset has been created, decide which workload to run. For seq rx y
 
 When running the test you can also capture a perfstat, setting -t 2 -i 8,0. FIO has to be launched once perfstat reaches the 'sleeping' status in Iteration 1. Meaning sync step d) with perfstat. 
 
+Description of the workload types
 
+OLTP : 8k random rx/wr, 80% rx - 20% write
+Analytics: 16k andom rx/wr, 50% rx - 50% write 
+Sequential read: 64k sequential read
+Sequential write: 64k sequential write
