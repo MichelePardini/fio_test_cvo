@@ -1,0 +1,19 @@
+#
+# Create DATASET
+# 
+# 50g * 2 jobs = 100GB per volume
+# on 4 volumes the total WSS will be 400GB
+#
+[global]
+directory=/dataset
+nrfiles=50
+filesize=50g
+ioengine=libaio
+direct=1
+numjobs=2
+filename_format=testfiles.$jobnum.$filenum
+
+[job1]
+readwrite=read
+bs=64k
+iodepth=64
