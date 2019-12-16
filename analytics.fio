@@ -7,7 +7,7 @@
 [global]
 directory=/dataset
 nrfiles=50
-filesize=50g
+size=50g
 ioengine=libaio
 direct=1
 numjobs=2
