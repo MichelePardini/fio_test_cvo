@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# General updates plus have HTTP up and running
+yum update -y
+yum install httpd -y
+service httpd start
+chkconfig httpd on
+
+# Install some libraries and GIT
+yum install gcc -y
+yum install zlib-devel -y 
+yum install libaio-devel -y 
+yum install git -y 
+yum install dos2unix -y 
+
+# clone GIT 
+git clone https://github.com/axboe/fio.git /fio
+
+
