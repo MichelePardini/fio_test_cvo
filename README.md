@@ -1,6 +1,6 @@
 # fio_test_cvo
 
-This REPO contains a set of .fio configuration files that can be used to run performance test on a NetApp Cloud Volumes ONTAP.
+## This REPO contains a set of .fio configuration files that can be used to run performance test on a NetApp Cloud Volumes ONTAP.
 
 This are the pre-req when configuring the testbed.
 1) When you deploy a CVO from Cloud Manager, the configuration should be
@@ -14,7 +14,7 @@ This are the pre-req when configuring the testbed.
       
 2) Use FIO v3.16 min.
 
-How to use it
+## How to use it
 
 a) Decide the size of the WSS based on the instance type<br/>
 b) edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS. Avoid changing 'numjobs'<br/>
@@ -23,11 +23,37 @@ d) once the dataset has been created, decide which workload to run. For seq rx y
 
 When running the test you can also capture a perfstat, setting -t 2 -i 8,0. FIO has to be launched once perfstat reaches the 'sleeping' status in Iteration 1. Meaning sync step d) with perfstat. 
 
-Description of the workload types<br/>
+## Description of the workload types<br/>
 
 w1) OLTP : 8k random rx/wr, 80% rx - 20% write<br/>
 w2) Analytics: 16k andom rx/wr, 50% rx - 50% write<br/>
 w3) Sequential read: 64k sequential read<br/>
 w4) Sequential write: 64k sequential write<br/>
 w5) 4k random reads (optional)<br/>
+
+## Preparing the Clients
+
+Assuming we're using Linux clients, you will need some packages on top of FIO. If you're using AWS you can run the script https://github.com/MichelePardini/fio_test_cvo/blob/master/aws_user_data_script.txt in the User Data when deploying the EC2 instances. This script will run some automatic updates plus cloning FIO from github. Besides these tasks, some manual steps are also required.
+I always loging as root on these clients
+
+1) For FIO (assuming /fio as install dir)<br/>
+  > cd /fio<br/>
+  > ./configure<br/>
+  > make<br/>
+  > make install<br/>
+  
+  fio will be located in /usr/local/bin
+
+2) To have FIO in PATH, this is only for AWS version of CentOS, for other you can use the standard procedure
+  > sudo su<br/>
+  > vi /root/.bashrc<br/>
+  add PATH=$PATH:/usr/local/bin<br/>
+  save and exit<br/>
+  > export PATH<br/>
+
+
+
+
+
+
 
