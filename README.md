@@ -16,16 +16,18 @@ This are the pre-req when configuring the testbed.
 
 How to use it
 
-a) Decide the size of the WSS based on the instance type
-b) edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS. Never change 'numjobs'.
-c) run 'fio create_dataset.fio' from 4 clients to create the dataset on the 4 volumes
-d) once the dataset has been created, decide which workload to run. For seq rx you can run 'fio 64k_seq_wr.fio' from all 8 Linux at the same time
+a) Decide the size of the WSS based on the instance type<br/>
+b) edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS. Avoid changing 'numjobs'<br/>
+c) run 'fio create_dataset.fio' from 4 clients to create the dataset on the 4 volumes<br/>
+d) once the dataset has been created, decide which workload to run. For seq rx you can run 'fio 64k_seq_wr.fio' from all 8 Linux at the same time<br/>
 
 When running the test you can also capture a perfstat, setting -t 2 -i 8,0. FIO has to be launched once perfstat reaches the 'sleeping' status in Iteration 1. Meaning sync step d) with perfstat. 
 
-Description of the workload types
+Description of the workload types<br/>
 
-OLTP : 8k random rx/wr, 80% rx - 20% write
-Analytics: 16k andom rx/wr, 50% rx - 50% write 
-Sequential read: 64k sequential read
-Sequential write: 64k sequential write
+w1) OLTP : 8k random rx/wr, 80% rx - 20% write<br/>
+w2) Analytics: 16k andom rx/wr, 50% rx - 50% write<br/>
+w3) Sequential read: 64k sequential read<br/>
+w4) Sequential write: 64k sequential write<br/>
+w5) 4k random reads (optional)<br/>
+
