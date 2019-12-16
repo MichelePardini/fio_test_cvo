@@ -47,8 +47,8 @@ Say you want to test OLTP workload and your goal is 40.000 op/s on a c5.9xlarge.
 
 So, 160Gb /4 volumes = 40Gb. You will have to edit the 'create_dataset.fio' to create 40Gb using two params
 
-> nrfiles=50
-> size=50g
+> nrfiles=50<br/>
+> size=50g<br/>
 
 You can see that the default here is 50g, so the dataset (per volume) will be indeed 50g <b>per job</b>. Since we also have
 
@@ -56,8 +56,8 @@ You can see that the default here is 50g, so the dataset (per volume) will be in
 
 Then the toal will be 50g * 2 = 100g, per volume (100 files of 1gb each). So, to have 40Gb in total, we have to change
 
-> nrfiles=20
-> size=20g
+> nrfiles=20<br/>
+> size=20g<br/>
 
 You can also decide not to change 'nrfiles', I like to have files of 1Gb. Don't change 'numjobs'. Save the changes and run fio against you 4 volumes to create 40*4=160Gb of WSS
 
