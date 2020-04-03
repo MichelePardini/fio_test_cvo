@@ -111,7 +111,7 @@ w3) Sequential read: 100% 64k sequential read<br/>
 w4) Sequential write: 100% 64k sequential write<br/>
 w5) 4k random reads: 100% 4k random reads<br/>
 
-## Running the workloads
+## Modifying the FIO workload configuration file
 
 First, you have to edit the fio workload confifuration file and change the 'directory' parameter to match your mount point name, like already done to create the WSS. Once done copy the file on all clients in the /fio directory.
 
@@ -119,7 +119,7 @@ The other important param that you may change is #iodepth. This represent the # 
 
 > iodepth=16
 
-It could be a good place to start, increasing it could increase the tput but also the response time. So you want to find a sweet spot. How? Let's say that the op/s target of your PoC is 40.000 op/s. So the math would be
+It could be a good place to start, increasing it could increase the tput but also the response time. So you want to find a sweet spot. How? In the example mentioned above we said that the target op/s is 40.000 op/s. So the math would be
 
 > iodepth = (target_IO * (latency/1000)) / (numbjobs * *#_Job * Linux_Clients)
 
@@ -132,6 +132,8 @@ Since iodepth can only be an integer you can set it to 1.
 > iodepth=1
 
 If you're not looking for a specific target_IO but you want to max out the instance, then leave 16 and assess.
+
+## Running FIO workloads
 
 You should have SSH open to all your Linux clients, then you can run - at the same time - the fio command for the desired workload, for instance if you want to run 4k random
 
