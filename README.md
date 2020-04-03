@@ -117,7 +117,7 @@ First, you have to edit the fio workload confifuration file and change the 'dire
 
 > directory=/dataset
 
-The other important param that you may change is #iodepth. This represent the # of commands kept inflight agains the CVO by any job. You can see that the defaul is 
+The other important param that you may change is 'iodepth'. This represent the # of commands kept inflight agains the CVO by any job. You can see that the defaul is 
 
 > iodepth=16
 
