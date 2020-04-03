@@ -150,7 +150,7 @@ In this page https://tobert.github.io/post/2014-04-17-fio-output-explained.html 
 
 ## Running customized workload
 
-The configuration files I have here are based on most commong workloads we see at customers, but you can run whatever type of workload you want. You just need to edit the config file and modify the key parameters in the [global] section. 
+The configuration files I have here are based on most common workloads we see at customers, but you can run whatever type of workload you want. You just need to edit the config file and modify the key parameters in the [global] section. 
 
 Here https://github.com/axboe/fio/tree/master/examples you can find lots of examples. 
 
