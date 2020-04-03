@@ -11,7 +11,7 @@ When you deploy a CVO from Cloud Manager, the configuration should be
   - This scenario assumes you use NFS, but also applies to SMB and iSCSI. When I say 'mount' I mean connect 1 client to 1 volume,           regardless of the protocol used
 
 For the test
-  - Use FIO v3.16 min. Man page here https://fio.readthedocs.io/en/latest/fio_doc.html
+  - Use FIO v3.19 min. Man page here https://fio.readthedocs.io/en/latest/fio_doc.html
   - Create 4 clients running RHEL 7.7.Each RHEL will mount 1 volume. You can use CenOS as well. The client VM type depends on the test       you want to run. The clients should be deployed in the same subnet as the CVO. 
   - On each client, create a directory to be used as mount point and then mount the respective volume from the CVO (note that you should     use the same name for the mount point on all Linux Clients)
   - The Working Set Size (WSS) varies depending on the instance type, the main rules are
@@ -148,8 +148,10 @@ So the report will be saved into a text file that you can check out later. In th
 
 In this page https://tobert.github.io/post/2014-04-17-fio-output-explained.html you will find all the info on how to read the FIO output
 
+## Running customized workload
 
+The configuration files I have here are based on most commong workloads we see at customers, but you can run whatever type of workload you want. You just need to edit the config file and modify the key parameters in the [global] section. 
 
-
+Here https://github.com/axboe/fio/tree/master/examples you can find lots of examples. 
 
 
