@@ -115,6 +115,8 @@ w5) 4k random reads: 100% 4k random reads<br/>
 
 First, you have to edit the fio workload confifuration file and change the 'directory' parameter to match your mount point name, like already done to create the WSS. Once done copy the file on all clients in the /fio directory.
 
+> directory=/dataset
+
 The other important param that you may change is #iodepth. This represent the # of commands kept inflight agains the CVO by any job. You can see that the defaul is 
 
 > iodepth=16
