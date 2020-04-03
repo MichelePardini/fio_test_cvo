@@ -5,16 +5,15 @@
 ## This are the pre-req when configuring the testbed.
 
 When you deploy a CVO from Cloud Manager, the configuration should be
-  - 1 data aggregate composed of 6 EBS disk of 4TB (or bigger) each. 
+  - 1 data aggregate. In AWS it should be composed of 6 EBS disk of 6TB; in Azure 12 disks of 6TB.
   - If you are testing an instance with FlashCache then the tiering to object store *MUST* be disabled
   - Create 4 volumes, each one with size of 2TB. If you are testing an instance with FlashCache then you must create the volumes with       Storage Efficiencies disabled
   - This scenario assumes you use NFS, but also applies to SMB and iSCSI. When I say 'mount' I mean connect 1 client to 1 volume,           regardless of the protocol used
-  - You can use the same name for the mount point on all Linux Clients
 
 For the test
   - Use FIO v3.16 min. Man page here https://fio.readthedocs.io/en/latest/fio_doc.html
   - Create 4 clients running RHEL 7.7.Each RHEL will mount 1 volume. You can use CenOS as well. The client VM type depends on the test       you want to run. The clients should be deployed in the same subnet as the CVO. 
-  - On each client, create a directory to be used as mount point and then mount the respective volume from the CVO.
+  - On each client, create a directory to be used as mount point and then mount the respective volume from the CVO (note that you should     use the same name for the mount point on all Linux Clients)
   - The Working Set Size (WSS) varies depending on the instance type, the main rules are
       - At least 10x the size of the Memory (RAM) if the instance does not have an NVME FlashCache
       - At least 2x the size of the NVMe FlashCache, if present
@@ -28,8 +27,7 @@ I would recommend to use always - at least - 2 clients and 2 volumes. 1 client m
 
 First, you have to chose the instance type. Don't pick a small instance, it should be able to manage at least 1GB/s via network, have 8 CPU and 32Gb of memory.
 
-Assuming we're using Linux clients, you will need some packages on top of FIO. If you're using AWS you can run the script https://github.com/MichelePardini/fio_test_cvo/blob/master/aws_user_data_script.txt in the User Data when deploying the EC2 instances. This script will run some automatic updates plus cloning FIO from github. Otherwise you can just open the txt file and run the commands manually. Besides these tasks, some manual steps are also required.
-I always loging as root
+Assuming we're using Linux clients, you will need some packages on top of FIO. If you're using AWS you can run the script https://github.com/MichelePardini/fio_test_cvo/blob/master/aws_user_data_script.txt in the User Data when deploying the EC2 instances. This script will run some automatic updates plus cloning FIO from github. Otherwise you can just open the txt file and run the commands manually. Besides these tasks, some manual steps are also required. I always loging as root
 
 1) For FIO (assuming /fio as install dir)<br/>
   > cd /fio<br/>
@@ -37,7 +35,7 @@ I always loging as root
   > make<br/>
   > make install<br/>
   
-  fio will be located in /usr/local/bin
+  FIO will be located in /usr/local/bin
 
 2) To have FIO in PATH, this is only for AWS version of CentOS, for other you can use the standard procedure
   > sudo su<br/>
@@ -53,9 +51,9 @@ I've chosen a progressive approach, instead of running at max throttle from the 
 ## How to use this setup
 
 a) By now you should have decided the number of volumes/clients and calculated the size of the WSS based on the instance type. Each        client is mouting 1 volume<br/>
-b) Edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS,  'iodepth' to define the            concurrency and 'directory' to match your mount point name. Avoid changing 'numjobs'<br/>
+b) Edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS, 'iodepth' to define the              concurrency and 'directory' to match your mount point name. Avoid changing 'numjobs'<br/>
 c) Run 'fio create_dataset.fio' to create the dataset on the volumes <br/>
-d) Once the dataset has been created, decide which workload to run. For seq rx you can run 'fio 64k_seq_wr.fio' from all the clients at the same time<br/>
+d) Once the dataset has been created, decide which workload to run. For seq rx you can run 'fio 64k_seq_wr.fio' from all the clients at    the same time<br/>
 
 ## Using Perfstat/PerfArchive
 
@@ -112,7 +110,7 @@ The last parameter to change is 'directory' , you can see the default is
 
 > directory=/dataset
 
-This will need to be changed to match your mount point. Since you will use the same file on all clients it's better to create the same mount point name on all. Save the changes and copy the file on all clients in the /fio directory
+This will need to be changed to match your mount point. Since you will use the same file on all clients it's better to create the same mount point name on all, as said before. Save the changes and copy the file on all clients in the /fio directory
 
 ## Creating the WSS
 
