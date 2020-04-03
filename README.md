@@ -51,7 +51,7 @@ I've chosen a progressive approach, instead of running at max throttle from the 
 ## How to use this setup
 
 a) By now you should have decided the number of volumes/clients and calculated the size of the WSS based on the instance type. Each        client is mouting 1 volume<br/>
-b) Edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS, 'iodepth' to define the              concurrency and 'directory' to match your mount point name. Avoid changing 'numjobs'<br/>
+b) Edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS, then the 'directory' param to        match your mount point name. Avoid changing 'numjobs'<br/>
 c) Run 'fio create_dataset.fio' to create the dataset on the volumes <br/>
 d) Once the dataset has been created, decide which workload to run. For seq rx you can run 'fio 64k_seq_wr.fio' from all the clients at    the same time<br/>
 
@@ -88,24 +88,6 @@ Back to our example, to have 250Gb in total we have to change
 
 You can also decide not to change 'nrfiles'. Files with larger size will result in a faster WSS creation. Don't change 'numjobs'. Save the changes and run fio against your 4 volumes to create 250*4=1TBGb of WSS
 
-The other important param that you may change is #iodepth. This represent the # of commands keept inflight agains the CVO by any job. You can see that the defaul is 
-
-> iodepth=16
-
-It could be a good place to start, increasing it could increase the tput but also the response time. So you want to find a sweet spot. How? At the beginning We said that the target of the PoC was 40.000 op/s. So the math would be
-
-> iodepth = (target_IO * (latency/1000)) / (numbjobs * *#_Job * Linux_Clients)
-
-How do you know the latency? Run a few ping from all clients. Say you TTL is 0.5ms. The result will be
-
-> (40.000 * (0.2 / 1000)) / (2 * 8 * 2) -> 20 / 32 = 0.6. 
-
-Since iodepth can only be an integer you can set it to 1. 
-
-> iodepth=1
-
-If you're not looking for a specific target_IO but you want to max out the instance, then leave 16 and assess.
-
 The last parameter to change is 'directory' , you can see the default is
 
 > directory=/dataset
@@ -132,6 +114,24 @@ w5) 4k random reads: 100% 4k random reads<br/>
 ## Running the workloads
 
 First, you have to edit the fio workload confifuration file and change the 'directory' parameter to match your mount point name, like already done to create the WSS. Once done copy the file on all clients in the /fio directory.
+
+The other important param that you may change is #iodepth. This represent the # of commands kept inflight agains the CVO by any job. You can see that the defaul is 
+
+> iodepth=16
+
+It could be a good place to start, increasing it could increase the tput but also the response time. So you want to find a sweet spot. How? Let's say that the op/s target of your PoC is 40.000 op/s. So the math would be
+
+> iodepth = (target_IO * (latency/1000)) / (numbjobs * *#_Job * Linux_Clients)
+
+How do you know the latency? Run a few ping from all clients. Say you TTL is 0.5ms. The result will be
+
+> (40.000 * (0.2 / 1000)) / (2 * 8 * 2) -> 20 / 32 = 0.6. 
+
+Since iodepth can only be an integer you can set it to 1. 
+
+> iodepth=1
+
+If you're not looking for a specific target_IO but you want to max out the instance, then leave 16 and assess.
 
 You should have SSH open to all your Linux clients, then you can run - at the same time - the fio command for the desired workload, for instance if you want to run 4k random
 
