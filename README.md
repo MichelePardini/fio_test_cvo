@@ -98,8 +98,8 @@ This will need to be changed to match your mount point. Since you will use the s
 
 Login into each client and run the fio command
 
-> # cd /fio
-> # /fio create_dataset.fio
+> cd /fio
+> /fio create_dataset.fio
 
 Once completed you will get the classic FIO report, but in this case it's not relevant, you can ignore it. You should have created the WSS on each volume. You can double check running 'ls' on all clients.
 
@@ -139,12 +139,12 @@ If you're not looking for a specific target_IO but you want to max out the insta
 
 You should have SSH open to all your Linux clients, then you can run - at the same time - the fio command for the desired workload, for instance if you want to run 4k random
 
-> # cd /fio
-> # ./fio 4k_random.fio 
+> cd /fio
+> ./fio 4k_random.fio 
 
 This will run for ~28 minutes. At the end of each run you will get a report on the console of your Clients. If you want to save this report either you can copy paste or you can run something like this
 
-> # ./fio 4k_random.fio > /tmp/4k_report_client1.log
+> ./fio 4k_random.fio > /tmp/4k_report_client1.log
 
 So the report will be saved into a text file that you can check out later. In the report you will have the most important information about the client stats, such avg rx/wr latency and avg rx/wr TPUT. 
 
