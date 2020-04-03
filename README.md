@@ -9,18 +9,42 @@ When you deploy a CVO from Cloud Manager, the configuration should be
   - If you are testing an instance with FlashCache then the tiering to object store *MUST* be disabled
   - Create 4 volumes, each one with size of 2TB. If you are testing an instance with FlashCache then you must create the volumes with       Storage Efficiencies disabled
   - This scenario assumes you use NFS, but also applies to SMB and iSCSI. When I say 'mount' I mean connect 1 client to 1 volume,           regardless of the protocol used
+  - You can use the same name for the mount point on all Linux Clients
 
 For the test
-  - Use FIO v3.16 min.
-  - Create 4 clients running RHEL 7.7.Each RHEL will mount 1 volume. You can use CenOS as well. The client VM type depends on the test       you want to run. We have a section later
+  - Use FIO v3.16 min. Man page here https://fio.readthedocs.io/en/latest/fio_doc.html
+  - Create 4 clients running RHEL 7.7.Each RHEL will mount 1 volume. You can use CenOS as well. The client VM type depends on the test       you want to run. The clients should be deployed in the same subnet as the CVO. 
+  - On each client, create a directory to be used as mount point and then mount the respective volume from the CVO.
   - The Working Set Size (WSS) varies depending on the instance type, the main rules are
       - At least 10x the size of the Memory (RAM) if the instance does not have an NVME FlashCache
       - At least 2x the size of the NVMe FlashCache, if present
-      - The resulting WSS will be split by the number of volumes (so in our case /4)
+      - The resulting WSS will be split by the number of volumes
 
 <b>NOTE</b>: the configuration presented here is the best practice for large and very large instances, with 36 and more CPUs. If you're testing a standard type of instance (16 CPU) 2 volumes and 2 clients could be enough. 
 
 I would recommend to use always - at least - 2 clients and 2 volumes. 1 client mapped to 1 volume via the desired protocol, best is 4 volumes and 4 clients
+
+## Preparing the Clients
+
+First, you have to chose the instance type. Don't pick a small instance, it should be able to manage at least 1GB/s via network, have 8 CPU and 32Gb of memory.
+
+Assuming we're using Linux clients, you will need some packages on top of FIO. If you're using AWS you can run the script https://github.com/MichelePardini/fio_test_cvo/blob/master/aws_user_data_script.txt in the User Data when deploying the EC2 instances. This script will run some automatic updates plus cloning FIO from github. Otherwise you can just open the txt file and run the commands manually. Besides these tasks, some manual steps are also required.
+I always loging as root
+
+1) For FIO (assuming /fio as install dir)<br/>
+  > cd /fio<br/>
+  > ./configure<br/>
+  > make<br/>
+  > make install<br/>
+  
+  fio will be located in /usr/local/bin
+
+2) To have FIO in PATH, this is only for AWS version of CentOS, for other you can use the standard procedure
+  > sudo su<br/>
+  > vi /root/.bashrc<br/>
+  add PATH=$PATH:/usr/local/bin<br/>
+  save and exit<br/>
+  > export PATH<br/>
 
 ## How does FIO add workload with these configuration files?
 
@@ -28,16 +52,18 @@ I've chosen a progressive approach, instead of running at max throttle from the 
 
 ## How to use this setup
 
-a) By now you should have decided the number of volumes/clients and calculated the size of the WSS based on the instance type. Each client is mouting 1 volume<br/>
-b) Edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS, and 'iodepth' to define the            concurrency. Avoid changing 'numjobs'<br/>
+a) By now you should have decided the number of volumes/clients and calculated the size of the WSS based on the instance type. Each        client is mouting 1 volume<br/>
+b) Edit the 'create_dataset.fio' and change the params 'size' and 'nrfiles' to accomodate the new WSS,  'iodepth' to define the            concurrency and 'directory' to match your mount point name. Avoid changing 'numjobs'<br/>
 c) Run 'fio create_dataset.fio' to create the dataset on the volumes <br/>
 d) Once the dataset has been created, decide which workload to run. For seq rx you can run 'fio 64k_seq_wr.fio' from all the clients at the same time<br/>
 
-## Use Perfstat
+## Using Perfstat/PerfArchive
 
-It is paramount to get a perfstat during the whole test, that will run for ~28 minutes, to understand when the max/best performance was achieved, meaning how many jobs where running. 
+For users that are familiar with NetApp and that want to investigate on CVO stats you can also get a perfstat during the whole test, that will run for ~28 minutes, to understand when the max/best performance was achieved, meaning how many jobs where running. 
 
 When running the test you should also capture a perfstat, setting -t 2 -i 8,0. FIO has to be launched once perfstat reaches the 'sleeping' status in Iteration 1. Meaning sync step d) with perfstat. 
+
+Otherwise you can trigger a PerfArchive once all the tests are completed. 
 
 ## Example on how to edit the configuration files depending on the test scenario 
 
@@ -74,7 +100,7 @@ It could be a good place to start, increasing it could increase the tput but als
 
 How do you know the latency? Run a few ping from all clients. Say you TTL is 0.5ms. The result will be
 
-(40.000 * (0.2 / 1000)) / (2 * 8 * 2) -> 20 / 32 = 0.6. 
+> (40.000 * (0.2 / 1000)) / (2 * 8 * 2) -> 20 / 32 = 0.6. 
 
 Since iodepth can only be an integer you can set it to 1. 
 
@@ -82,40 +108,45 @@ Since iodepth can only be an integer you can set it to 1.
 
 If you're not looking for a specific target_IO but you want to max out the instance, then leave 16 and assess.
 
+The last parameter to change is 'directory' , you can see the default is
+
+> directory=/dataset
+
+This will need to be changed to match your mount point. Since you will use the same file on all clients it's better to create the same mount point name on all. Save the changes and copy the file on all clients in the /fio directory
+
+## Creating the WSS
+
+Login into each client and run the fio command
+
+> #> cd /fio
+> #>./fio create_dataset.fio
+
+Once completed you will get the classic FIO report, but in this case it's not relevant, you can ignore it. You should have created the WSS on each volume. You can double check running 'ls' on all clients.
 
 ## Description of the workload types<br/>
 
 w1) OLTP : 8k random rx/wr, 80% rx - 20% write<br/>
 w2) Analytics: 16k random rx/wr, 50% rx - 50% write<br/>
-w3) Sequential read: 64k sequential read<br/>
-w4) Sequential write: 64k sequential write<br/>
-w5) 4k random reads (optional)<br/>
-
-## Preparing the Clients
-
-Assuming we're using Linux clients, you will need some packages on top of FIO. If you're using AWS you can run the script https://github.com/MichelePardini/fio_test_cvo/blob/master/aws_user_data_script.txt in the User Data when deploying the EC2 instances. This script will run some automatic updates plus cloning FIO from github. Besides these tasks, some manual steps are also required.
-I always loging as root on these clients
-
-1) For FIO (assuming /fio as install dir)<br/>
-  > cd /fio<br/>
-  > ./configure<br/>
-  > make<br/>
-  > make install<br/>
-  
-  fio will be located in /usr/local/bin
-
-2) To have FIO in PATH, this is only for AWS version of CentOS, for other you can use the standard procedure
-  > sudo su<br/>
-  > vi /root/.bashrc<br/>
-  add PATH=$PATH:/usr/local/bin<br/>
-  save and exit<br/>
-  > export PATH<br/>
+w3) Sequential read: 100% 64k sequential read<br/>
+w4) Sequential write: 100% 64k sequential write<br/>
+w5) 4k random reads: 100% 4k random reads<br/>
 
 ## Running the workloads
 
-You should have SSH open to all your Linux clients, then you can run - at the same time - the fio command for the desired workload
+First, you have to edit the fio workload confifuration file and change the 'directory' parameter to match your mount point name, like already done to create the WSS. Once done copy the file on all clients in the /fio directory.
 
-#>./fio 
+You should have SSH open to all your Linux clients, then you can run - at the same time - the fio command for the desired workload, for instance if you want to run 4k random
+
+> #> cd /fio
+> #>./fio 4k_random.fio 
+
+This will run for ~28 minutes. At the end of each run you will get a report on the console of your Clients. If you want to save this report either you can copy paste or you can run something like this
+
+> #>./fio 4k_random.fio > /tmp/4k_report_client1.log
+
+So the report will be saved into a text file that you can check out later. In the report you will have the most important information about the client stats, such avg rx/wr latency and avg rx/wr TPUT. 
+
+In this page https://tobert.github.io/post/2014-04-17-fio-output-explained.html you will find all the info on how to read the FIO output
 
 
 
