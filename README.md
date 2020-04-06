@@ -27,7 +27,7 @@ I would recommend to use always - at least - 2 clients and 2 volumes. 1 client m
 
 First, you have to chose the instance type. Don't pick a small instance, it should be able to manage at least 1GB/s via network, have 8 CPU and 32Gb of memory.
 
-Assuming we're using Linux clients, you will need some packages on top of FIO. If you're using AWS you can run the script https://github.com/MichelePardini/fio_test_cvo/blob/master/aws_user_data_script.txt in the User Data when deploying the EC2 instances. This script will run some automatic updates plus cloning FIO from github. Otherwise you can just open the txt file and run the commands manually. Besides these tasks, some manual steps are also required. I always loging as root
+Assuming we're using Linux clients, you will need some packages on top of FIO. If you're using AWS you can run the script https://github.com/MichelePardini/fio_test_cvo/blob/master/aws_user_data_script.txt in the User Data when deploying the EC2 instances. This script will run some automatic updates plus cloning FIO from github. Otherwise you can just open the txt file and run the commands manually. Besides these tasks, some manual steps are also required. I like to run the 'git clone' command from / , so the install dir will be /fio. I assume logging as root. 
 
 1) For FIO (assuming /fio as install dir)<br/>
   > cd /fio<br/>
