@@ -148,7 +148,7 @@ So the report will be saved into a text file that you can check out later. In th
 
 In this page https://tobert.github.io/post/2014-04-17-fio-output-explained.html you will find all the info on how to read the FIO output
 
-## Running customized workload
+## Running a customized workload
 
 The configuration files I have here are based on most common workloads we see at customers, but you can run whatever type of workload you want. You just need to edit the config file and modify the key parameters in the [global] section. 
 
