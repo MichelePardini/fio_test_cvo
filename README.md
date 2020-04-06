@@ -83,10 +83,10 @@ Then the total will be 50g * 2 = 100g, per volume. The param 'nrfile' defines th
 
 Back to our example, to have 250Gb in total we have to change
 
-> nrfiles=12<br/>
+> nrfiles=10<br/>
 > size=125g<br/>
 
-You can also decide not to change 'nrfiles'. Files with larger size will result in a faster WSS creation. Don't change 'numjobs'. Save the changes and run fio against your 4 volumes to create 250*4=1TBGb of WSS
+You can also decide not to change 'nrfiles', here I changed to 10, each file will be 12.5gb in size, files with larger size will result in a faster WSS creation. Don't change 'numjobs'. Save the changes and run fio against your 4 volumes to create 250*4=1TBGb of WSS
 
 The last parameter to change is 'directory' , you can see the default is
 
